@@ -1,0 +1,29 @@
+### 1. Создать продукт
+POST http://127.0.0.1:8000/api/v1/products/
+Content-Type: application/json
+
+{
+    "title": "Молоко",
+    "description": "2.5%"
+}
+
+### 2. Создать склад (замените "product": 1 на ID из ответа выше)
+POST http://127.0.0.1:8000/api/v1/stocks/
+Content-Type: application/json
+
+{
+    "address": "ул. Ленина, 10",
+    "positions": [
+        {
+            "product": 1,
+            "quantity": 10,
+            "price": "50.00"
+        }
+    ]
+}
+
+### 3. Поиск продуктов
+GET http://127.0.0.1:8000/api/v1/products/?search=молоко
+
+### 4. Склады, в которых есть продукт 1
+GET http://127.0.0.1:8000/api/v1/stocks/?positions__product=1
