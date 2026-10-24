@@ -1,5 +1,31 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=PyCharm
+### 1. Создать датчик
+POST http://127.0.0.1:8000/api/sensors/create/
+Content-Type: application/json
 
-###
+{
+    "name": "ESP32",
+    "description": "Датчик на кухне за холодильником"
+}
+
+### 2. Создать измерение (замените 1 на ID из ответа выше, если он другой)
+POST http://127.0.0.1:8000/api/measurements/create/
+Content-Type: application/json
+
+{
+    "sensor": 4,
+    "temperature": 22.5
+}
+
+### 3. Список датчиков
+GET http://127.0.0.1:8000/api/sensors/
+
+### 4. Детали датчика (замените 1 на ваш ID)
+GET http://127.0.0.1:8000/api/sensors/1/
+
+### 5. Изменить датчик (замените 1 на ваш ID)
+PATCH http://127.0.0.1:8000/api/sensors/4/
+Content-Type: application/json
+
+{
+    "description": "Перенес датчик на балкон"
+}
