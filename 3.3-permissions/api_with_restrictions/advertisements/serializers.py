@@ -5,7 +5,6 @@ from advertisements.models import Advertisement
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer для пользователя."""
 
     class Meta:
         model = User
@@ -14,7 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AdvertisementSerializer(serializers.ModelSerializer):
-    """Serializer для объявления."""
 
     creator = UserSerializer(
         read_only=True,
@@ -26,30 +24,24 @@ class AdvertisementSerializer(serializers.ModelSerializer):
                   'status', 'created_at', )
 
     def create(self, validated_data):
-        """Метод для создания"""
 
-        # Простановка значения поля создатель по-умолчанию.
-        # Текущий пользователь является создателем объявления
-        # изменить или переопределить его через API нельзя.
-        # обратите внимание на `context` – он выставляется автоматически
-        # через методы ViewSet.
-        # само поле при этом объявляется как `read_only=True`
         validated_data["creator"] = self.context["request"].user
         return super().create(validated_data)
 
     def validate(self, data):
-        """Метод для валидации. Вызывается при создании и обновлении."""
-
-        if self.instance is None:
-            user = self.context["request"].user
+        user = self.context["request"].user
+        new_status = data.get('status', getattr(self.instance, 'status', 'OPEN'))
+        if new_status == 'OPEN':
             open_count = Advertisement.objects.filter(
                 creator=user,
                 status='OPEN'
             ).count()
 
-            new_status = data.get('status', 'OPEN')
+            is_becoming_open = True
+            if self.instance and self.instance.status == 'OPEN':
+                is_becoming_open = False
 
-            if new_status == 'OPEN' and open_count >= 10:
+            if is_becoming_open and open_count >= 10:
                 raise serializers.ValidationError(
                     "У вас не может быть больше 10 открытых объявлений."
                 )
